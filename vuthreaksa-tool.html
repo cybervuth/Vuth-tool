@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vuthreaksa-tool</title>
+<style>
+  :root{
+    --bg: #060608;
+    --bg-raised: #101018;
+    --line: #24242f;
+    --accent: #7fb7e8;
+    --accent-dim: #4d7396;
+    --text: #ece9e2;
+    --text-dim: #93909e;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  .mono{ font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* animated starfield */
+  #stars{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  #stars span{
+    position:absolute;
+    display:block;
+    background:#ffffff;
+    border-radius:50%;
+    animation: twinkle linear infinite;
+    opacity:.15;
+  }
+  @keyframes twinkle{
+    0%, 100%{ opacity:.12; transform:scale(1); }
+    50%{ opacity:.9; transform:scale(1.5); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #stars span{ animation:none; opacity:.3; }
+    html{ scroll-behavior:auto; }
+  }
+
+  header{
+    position:relative;
+    z-index:1;
+    padding:76px 24px 44px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  header .mark{
+    font-size:13px;
+    letter-spacing:.14em;
+    color:var(--accent-dim);
+    margin-bottom:16px;
+  }
+  header h1{
+    font-size: clamp(30px, 6vw, 50px);
+    margin:0 0 14px;
+    font-weight:600;
+  }
+  header h1 span{ color:var(--accent); }
+  header p{
+    max-width:520px;
+    margin:0 auto;
+    color:var(--text-dim);
+    font-size:15.5px;
+  }
+
+  main{
+    position:relative;
+    z-index:1;
+    max-width:720px;
+    margin:0 auto;
+    padding:56px 24px 110px;
+    display:flex;
+    flex-direction:column;
+    gap:38px;
+  }
+
+  .tool{
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:30px;
+  }
+  .tool-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .tool-num{
+    color:var(--accent-dim);
+    font-family: ui-monospace, monospace;
+    font-size:13px;
+  }
+  .tool h2{
+    margin:0;
+    font-size:21px;
+  }
+  .tool .sub{
+    color:var(--text-dim);
+    font-size:13.5px;
+    margin:0 0 22px;
+  }
+
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block;
+    font-size:11.5px;
+    color:var(--text-dim);
+    margin-bottom:6px;
+    font-family: ui-monospace, monospace;
+  }
+  textarea, input[type=text], select{
+    width:100%;
+    background:#0a0a12;
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:11px 13px;
+    border-radius:6px;
+    font-family: ui-monospace, monospace;
+    font-size:13.5px;
+  }
+  textarea{ resize:vertical; min-height:88px; }
+  input:focus, textarea:focus, select:focus{
+    outline:2px solid var(--accent-dim);
+    outline-offset:1px;
+  }
+
+  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  button.action{
+    background:var(--accent);
+    color:#07131c;
+    border:none;
+    padding:10px 18px;
+    border-radius:6px;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  button.action:hover{ background:#a3cdf2; }
+  button.ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    padding:10px 16px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13.5px;
+    font-family:inherit;
+  }
+  button.ghost:hover{ color:var(--text); border-color:var(--accent-dim); }
+
+  .result{
+    margin-top:16px;
+    background:#0a0a12;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px;
+    font-family: ui-monospace, monospace;
+    font-size:12.5px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    max-height:240px;
+    overflow:auto;
+    color:var(--text-dim);
+  }
+  .result.filled{ color:var(--text); }
+  .kv{ display:grid; grid-template-columns:110px 1fr; gap:6px 10px; }
+  .kv div:nth-child(odd){ color:var(--text-dim); }
+
+  .note{
+    font-size:12px;
+    color:var(--accent-dim);
+    border-left:2px solid var(--accent-dim);
+    padding-left:10px;
+    margin-top:14px;
+  }
+  .msg-list{
+    margin-top:14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:300px;
+    overflow:auto;
+  }
+  .msg-item{
+    background:#0a0a12;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:9px 11px;
+    font-size:13px;
+  }
+
+  footer{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    padding:30px;
+    color:var(--text-dim);
+    font-size:12px;
+    border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header>
+  <div class="mark mono">★ VUTHREAKSA-TOOL ★</div>
+   <h1><span>ឧបករណ៍</span> សម្រាប់ប្រើប្រាស់</h1>
+  <p>Enjoy with tools</p>
+</header>
+
+<main>
+
+  <!-- TOOL 1: IP -->
+  <div class="tool" id="ip">
+    <div class="tool-head"><span class="tool-num mono">01</span><h2>ព័ត៌មាន IP របស់ខ្ញុំ</h2></div>
+    <p class="sub">ឧបករណ៍នេះនឹងប្រាប់អំពី IP របស់អ្នក </p>
+    <button class="action" id="ipBtn">បង្ហាញព័ត៌មាន IP របស់ខ្ញុំ</button>
+    <div class="result mono" id="ipResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">បង្ហាញតែអាសយដ្ឋានផ្ទាល់ខ្លួនរបស់អ្នកប៉ុណ្ណោះ</p>
+  </div>
+
+  <!-- TOOL 2: PHONE NUMBER INFO -->
+  <div class="tool" id="phone">
+    <div class="tool-head"><span class="tool-num mono">02</span><h2>ព័ត៌មានលេខទូរស័ព្ទ</h2></div>
+    <p class="sub">វាយលេខទូរស័ព្ទដែលអ្នកចង់ដឹងព័ត៌មានរបស់វា</p>
+    <div class="field">
+      <label>លេខទូរស័ព្ទ</label>
+      <input type="text" id="phoneInput" placeholder="Example 012345678">
+    </div>
+    <button class="action" id="phoneBtn">ពិនិត្យលេខ</button>
+    <div class="result mono" id="phoneResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ឧបករណ៍នេះអាចពិនិត្យមើលព័ត៌មានអំពីលេខទូរស័ព្ទកម្រិតតិចតួចប៉ុណ្ណោះ</p>
+  </div>
+
+  <!-- TOOL 3: TRANSLATE -->
+  <div class="tool" id="translate">
+    <div class="tool-head"><span class="tool-num mono">03</span><h2>បកប្រែភាសា</h2></div>
+    <p class="sub">បកប្រែភាសាបានច្រើនភាសា លើកលែងភាសាចោលសៀមមួយ Thiefland</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="translateInput" placeholder="វាយអត្ថបទដែលអ្នកចង់បកប្រែ"></textarea>
+    </div>
+    <div class="row" style="margin-bottom:14px;">
+      <div class="field" style="flex:1; min-width:140px;">
+        <label>ពីភាសា</label>
+        <select id="fromLang">
+          <option value="en">អង់គ្លេស</option>
+          <option value="km">ខ្មែរ</option>
+          <option value="es">អេស្ប៉ាញ</option>
+          <option value="fr">បារាំង</option>
+          <option value="de">អាល្លឺម៉ង់</option>
+          <option value="it">អ៊ីតាលី</option>
+          <option value="pt">ព័រទុយហ្កាល់</option>
+          <option value="ru">រុស្សី</option>
+          <option value="ja">ជប៉ុន</option>
+          <option value="ko">កូរ៉េ</option>
+          <option value="zh">ចិន</option>
+          <option value="vi">វៀតណាម</option>
+          <option value="id">ឥណ្ឌូនេស៊ី</option>
+          <option value="ms">ម៉ាឡេស៊ី</option>
+          <option value="hi">ហិណ្ឌូ</option>
+          <option value="ar">អារ៉ាប់</option>
+          <option value="tr">ទួរគី</option>
+          <option value="nl">ហូឡង់</option>
+          <option value="pl">ប៉ូឡូញ</option>
+          <option value="sv">ស៊ុយអែត</option>
+          <option value="fil">ហ្វីលីពីន</option>
+          <option value="lo">ឡាវ</option>
+          <option value="my">មីយ៉ាន់ម៉ា</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1; min-width:140px;">
+        <label>ទៅភាសា</label>
+        <select id="toLang">
+          <option value="km">ខ្មែរ</option>
+          <option value="en">អង់គ្លេស</option>
+          <option value="es">អេស្ប៉ាញ</option>
+          <option value="fr">បារាំង</option>
+          <option value="de">អាល្លឺម៉ង់</option>
+          <option value="it">អ៊ីតាលី</option>
+          <option value="pt">ព័រទុយហ្កាល់</option>
+          <option value="ru">រុស្សី</option>
+          <option value="ja">ជប៉ុន</option>
+          <option value="ko">កូរ៉េ</option>
+          <option value="zh">ចិន</option>
+          <option value="vi">វៀតណាម</option>
+          <option value="id">ឥណ្ឌូនេស៊ី</option>
+          <option value="ms">ម៉ាឡេស៊ី</option>
+          <option value="hi">ហិណ្ឌូ</option>
+          <option value="ar">អារ៉ាប់</option>
+          <option value="tr">ទួរគី</option>
+          <option value="nl">ហូឡង់</option>
+          <option value="pl">ប៉ូឡូញ</option>
+          <option value="sv">ស៊ុយអែត</option>
+          <option value="fil">ហ្វីលីពីន</option>
+          <option value="lo">ឡាវ</option>
+          <option value="my">មីយ៉ាន់ម៉ា</option>
+        </select>
+      </div>
+    </div>
+    <button class="action" id="translateBtn">បកប្រែ</button>
+    <div class="result mono" id="translateResult">លទ្ធផលបកប្រែនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ឧបករណ៍នេះមិនស្គាល់អក្សរអង់គ្លេសសុីងខ្មែរទេ</p>
+  </div>
+
+  <!-- TOOL 3: BASE64 -->
+  <div class="tool" id="b64text">
+    <div class="tool-head"><span class="tool-num mono">04</span><h2>Base64</h2></div>
+    <p class="sub">បម្លែងអត្ថបទធម្មតាទៅជា Base64 និងបកប្រែវិញ</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="b64Input" placeholder="វាយអត្ថបទនៅទីនេះ"></textarea>
+    </div>
+    <div class="row">
+      <button class="action" id="toBase64Btn">អត្ថបទ → Base64</button>
+      <button class="action" id="fromBase64Btn">Base64 → អត្ថបទ</button>
+    </div>
+    <div class="result mono" id="b64Result">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="b64CopyBtn">ចម្លងលទ្ធផល</button>
+    </div>
+  </div>
+
+  <!-- TOOL 4: BINARY -->
+  <div class="tool" id="binarytext">
+    <div class="tool-head"><span class="tool-num mono">05</span><h2>Binary</h2></div>
+    <p class="sub">បម្លែងអត្ថបទធម្មតាទៅជា Binary និងបកប្រែមកវិញ</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="binInput" placeholder="វាយអត្ថបទនៅទីនេះ"></textarea>
+    </div>
+    <div class="row">
+      <button class="action" id="toBinaryBtn">អត្ថបទ → Binary</button>
+      <button class="action" id="fromBinaryBtn">Binary → អត្ថបទ</button>
+    </div>
+    <div class="result mono" id="binResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="binCopyBtn">ចម្លងលទ្ធផល</button>
+    </div>
+  </div>
+
+  <!-- TOOL 5: WORD REPEATER -->
+  <div class="tool" id="wordgen">
+    <div class="tool-head"><span class="tool-num mono">06</span><h2>ឧបករណ៍ចម្លងពាក្យច្រើន</h2></div>
+    <p class="sub">ឧបករណ៍នេះអាចបង្កើតពាក្យឬឃ្លាដែលអ្នកចង់សរសេរហើយវានឹងបង្កើតពាក្យឬឃ្លានោះដែលអ្នកចង់បានរាប់ជួរនិងមានលេខរាប់ជួរឬអត់តាមតែអ្នក</p>
+    <div class="field">
+      <label>ពាក្យ / ឃ្លា</label>
+      <input type="text" id="repeatWord" placeholder="Exaple បងស្រលាញ់អូន">
+    </div>
+    <div class="row" style="margin-bottom:14px; align-items:flex-end;">
+      <div class="field" style="max-width:200px; margin-bottom:0;">
+        <label>ចំនួនដងដែលចង់បាន</label>
+        <input type="text" id="repeatCount" value="10">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="repeatNumbered" checked style="width:auto;">
+          ដាក់លេខរាប់ជួរ
+        </label>
+      </div>
+    </div>
+    <button class="action" id="repeatBtn">បង្កើតបញ្ជី</button>
+    <div class="result mono" id="repeatResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="repeatCopyBtn">ចម្លងលទ្ធផល</button>
+      <button class="ghost" id="repeatDownloadBtn">ទាញយកជា file.txt</button>
+    </div>
+  </div>
+
+  <!-- TOOL 7: PHOTO METADATA CHECKER -->
+  <div class="tool" id="photometa">
+    <div class="tool-head"><span class="tool-num mono">07</span><h2>ពិនិត្យទិន្នន័យលាក់នៅក្នុងរូបភាព</h2></div>
+    <p class="sub">ឧបករណ៍នេះសម្រាប់ពិនិត្យរូបភាព <b>របស់អ្នកផ្ទាល់</b> មុនពេលបញ្ចូនអោយអ្នកដទៃ ឬបង្ហោះលើ social media ដើម្បីមើលថាតើវាមានទីតាំង GPS ឬព័ត៌មានផ្សេងលាក់នៅក្នុងវាដែរឬអត់</p>
+    <div class="field">
+      <label>ជ្រើសរើសរូបភាព (JPEG)</label>
+      <input type="file" id="metaInput" accept="image/jpeg,image/jpg">
+    </div>
+    <button class="action" id="metaBtn">ពិនិត្យរូបភាព</button>
+    <div class="result mono" id="metaResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ប្រើសម្រាប់ការពារភាពឯកជនរបស់អ្នកប៉ុណ្ណោះ</p>
+  </div>
+
+</main>
+
+<footer>Made by VuthReaksa Developer</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+<script>
+  // Animated starfield
+  const starsEl = document.getElementById('stars');
+  const STAR_COUNT = 90;
+  for(let i=0;i<STAR_COUNT;i++){
+    const s = document.createElement('span');
+    const size = (Math.random()*2 + 0.6).toFixed(1);
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.top = Math.random()*100 + 'vh';
+    s.style.animationDuration = (2 + Math.random()*4).toFixed(2) + 's';
+    s.style.animationDelay = (Math.random()*4).toFixed(2) + 's';
+    starsEl.appendChild(s);
+  }
+
+  // IP lookup
+  document.getElementById('ipBtn').addEventListener('click', async ()=>{
+    const out = document.getElementById('ipResult');
+    out.textContent = 'កំពុងស្វែងរក…';
+    out.classList.remove('filled');
+    try{
+      const res = await fetch('https://ipapi.co/json/');
+      if(!res.ok) throw new Error('lookup failed');
+      const d = await res.json();
+      out.innerHTML = `<div class="kv">
+        <div>IP</div><div>${d.ip ?? '—'}</div>
+        <div>City</div><div>${d.city ?? '—'}</div>
+        <div>Region</div><div>${d.region ?? '—'}</div>
+        <div>Country</div><div>${d.country_name ?? '—'}</div>
+        <div>ISP</div><div>${d.org ?? '—'}</div>
+        <div>Timezone</div><div>${d.timezone ?? '—'}</div>
+      </div>`;
+      out.classList.add('filled');
+    }catch(e){
+      out.textContent = 'មិនអាចភ្ជាប់ទៅសេវាកម្មបានទេពេលនេះ ឧបករណ៍នេះត្រូវការការភ្ជាប់អ៊ីនធឺណិតនៅក្នុង browser ធម្មតា';
+    }
+  });
+
+  // Phone number info (format check only — no ownership/reverse lookup)
+  const PHONE_COUNTRIES = [
+    {code:'855', name:'Cambodia (កម្ពុជា)', minLen:8, maxLen:9},
+    {code:'66', name:'Thailand', minLen:9, maxLen:9},
+    {code:'84', name:'Vietnam', minLen:9, maxLen:10},
+    {code:'856', name:'Laos', minLen:8, maxLen:10},
+    {code:'95', name:'Myanmar', minLen:8, maxLen:10},
+    {code:'60', name:'Malaysia', minLen:9, maxLen:10},
+    {code:'62', name:'Indonesia', minLen:9, maxLen:12},
+    {code:'63', name:'Philippines', minLen:10, maxLen:10},
+    {code:'65', name:'Singapore', minLen:8, maxLen:8},
+    {code:'86', name:'China', minLen:11, maxLen:11},
+    {code:'82', name:'South Korea', minLen:9, maxLen:10},
+    {code:'81', name:'Japan', minLen:9, maxLen:10},
+    {code:'91', name:'India', minLen:10, maxLen:10},
+    {code:'1', name:'US / Canada', minLen:10, maxLen:10},
+    {code:'44', name:'United Kingdom', minLen:10, maxLen:10},
+    {code:'33', name:'France', minLen:9, maxLen:9},
+    {code:'49', name:'Germany', minLen:10, maxLen:11},
+    {code:'61', name:'Australia', minLen:9, maxLen:9},
+  ];
+  document.getElementById('phoneBtn').addEventListener('click', ()=>{
+    const raw = document.getElementById('phoneInput').value.trim();
+    const out = document.getElementById('phoneResult');
+    if(!raw){ out.textContent = 'លេខខ្លីពេកសូមពិនិត្យម្តងទៀត'; out.classList.remove('filled'); return; }
+    const digits = raw.replace(/[^\d+]/g, '');
+    const plainDigits = digits.replace(/\D/g, '');
+    if(plainDigits.length < 6){
+      out.textContent = 'លេខខ្លីពេសូមពិនិត្យម្តងទៀត';
+      out.classList.remove('filled');
+      return;
+    }
+    let match = null;
+    let nationalNumber = plainDigits;
+    if(digits.startsWith('+')){
+      match = PHONE_COUNTRIES
+        .filter(c=>plainDigits.startsWith(c.code))
+        .sort((a,b)=>b.code.length - a.code.length)[0];
+      if(match) nationalNumber = plainDigits.slice(match.code.length);
+    } else {
+      // No country code given — assume Cambodia, strip a leading 0 if present
+      match = PHONE_COUNTRIES.find(c=>c.code === '855');
+      nationalNumber = plainDigits.startsWith('0') ? plainDigits.slice(1) : plainDigits;
+    }
+    let report = '';
+    if(match){
+      const validLength = nationalNumber.length >= match.minLen && nationalNumber.length <= match.maxLen;
+      report = `ប្រទេស: ${match.name}\nលេខកូដប្រទេស: +${match.code}\nលេខជាតិ: ${nationalNumber}\nចំនួនខ្ទង់: ${nationalNumber.length}\nទ្រង់ទ្រាយ: ${validLength ? 'ត្រឹមត្រូវ' : 'ប្រហែលមិនត្រឹមត្រូវ (ចំនួនខ្ទង់មិនប្រក្រតី)'}`;
+    } else {
+      report = `មិនអាចកំណត់ប្រទេសបានទេ\nចំនួនខ្ទង់សរុប: ${plainDigits.length}`;
+    }
+    out.textContent = report;
+    out.classList.add('filled');
+  });
+
+  // Translate
+  document.getElementById('translateBtn').addEventListener('click', async ()=>{
+    const text = document.getElementById('translateInput').value.trim();
+    const from = document.getElementById('fromLang').value;
+    const to = document.getElementById('toLang').value;
+    const out = document.getElementById('translateResult');
+    if(!text){ out.textContent = 'សូមវាយអត្ថបទសិន'; return; }
+    out.textContent = 'កំពុងបកប្រែ…';
+    out.classList.remove('filled');
+    try{
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const translated = data?.responseData?.translatedText;
+      out.textContent = translated || 'គ្មានលទ្ធផលបកប្រែត្រឡប់មកវិញ។';
+      out.classList.add('filled');
+    }catch(e){
+      out.textContent = 'មិនអាចភ្ជាប់ទៅសេវាបកប្រែបានទេពេលនេះ ត្រូវការភ្ជាប់អ៊ីនធឺណិត។';
+    }
+  });
+
+  // Base64
+  let lastB64Result = '';
+  function setB64Result(text){
+    lastB64Result = text;
+    const out = document.getElementById('b64Result');
+    out.textContent = text;
+    out.classList.add('filled');
+  }
+  document.getElementById('toBase64Btn').addEventListener('click', ()=>{
+    const text = document.getElementById('b64Input').value;
+    try{ setB64Result(btoa(unescape(encodeURIComponent(text)))); }
+    catch(e){ setB64Result('មិនអាចបំលែងអត្ថបទនេះបានទេ។'); }
+  });
+  document.getElementById('fromBase64Btn').addEventListener('click', ()=>{
+    const text = document.getElementById('b64Input').value.trim();
+    try{ setB64Result(decodeURIComponent(escape(atob(text)))); }
+    catch(e){ setB64Result('នេះមិនមែនជា Base64 ត្រឹមត្រូវទេ។'); }
+  });
+  document.getElementById('b64CopyBtn').addEventListener('click', async ()=>{
+    if(!lastB64Result){ alert('សូមបង្កើតលទ្ធផលសិន។'); return; }
+    try{ await navigator.clipboard.writeText(lastB64Result); alert('ចម្លងទៅ clipboard រួចរាល់។'); }
+    catch(e){ alert('ចម្លងមិនបានទេ browser របស់អ្នកអាចនឹងទប់ស្កាត់។'); }
+  });
+
+  // Binary
+  let lastBinResult = '';
+  function setBinResult(text){
+    lastBinResult = text;
+    const out = document.getElementById('binResult');
+    out.textContent = text;
+    out.classList.add('filled');
+  }
+  document.getElementById('toBinaryBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('binInput').value;
+    const bytes = new TextEncoder().encode(text);
+    const bin = Array.from(bytes).map(b=>b.toString(2).padStart(8,'0')).join(' ');
+    setBinResult(bin);
+  });
+  document.getElementById('fromBinaryBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('binInput').value.trim();
+    try{
+      const bytes = text.split(/\s+/).map(b=>parseInt(b,2));
+      if(bytes.some(isNaN)) throw new Error();
+      setBinResult(new TextDecoder().decode(new Uint8Array(bytes)));
+    }catch(e){ setBinResult('នេះមិនមែនជា Binary ត្រឹមត្រូវទេ (ត្រូវការក្រុមលេខ 8 khonat ដកឃ្លាគ្នា)។'); }
+  });
+  document.getElementById('binCopyBtn').addEventListener('click', async ()=>{
+    if(!lastBinResult){ alert('សូមបង្កើតលទ្ធផលសិន។'); return; }
+    try{ await navigator.clipboard.writeText(lastBinResult); alert('ចម្លងទៅ clipboard រួចរាល់។'); }
+    catch(e){ alert('ចម្លងមិនបានទេ browser របស់អ្នកអាចនឹងទប់ស្កាត់។'); }
+  });
+
+  // Word repeater
+  let lastRepeatResult = '';
+  document.getElementById('repeatBtn').addEventListener('click', ()=>{
+    const word = document.getElementById('repeatWord').value.trim();
+    const out = document.getElementById('repeatResult');
+    let count = parseInt(document.getElementById('repeatCount').value, 10);
+    const numbered = document.getElementById('repeatNumbered').checked;
+    if(!word){
+      out.textContent = 'សូមវាយពាក្យ ឬឃ្លាសិន។';
+      out.classList.remove('filled');
+      return;
+    }
+    if(isNaN(count) || count < 1) count = 1;
+    if(count > 5000) count = 5000;
+    const lines = [];
+    for(let i=1;i<=count;i++){
+      lines.push(numbered ? `${i}. ${word}` : word);
+    }
+    const result = lines.join('\n');
+    lastRepeatResult = result;
+    out.textContent = result;
+    out.classList.add('filled');
+  });
+  document.getElementById('repeatCopyBtn').addEventListener('click', async ()=>{
+    if(!lastRepeatResult){ alert('សូមបង្កើតបញ្ជីសិន។'); return; }
+    try{ await navigator.clipboard.writeText(lastRepeatResult); alert('ចម្លងទៅ clipboard រួចរាល់។'); }
+    catch(e){ alert('ចម្លងមិនបានទេ browser របស់អ្នកអាចនឹងទប់ស្កាត់។'); }
+  });
+  document.getElementById('repeatDownloadBtn').addEventListener('click', ()=>{
+    if(!lastRepeatResult){ alert('សូមបង្កើតបញ្ជីសិន។'); return; }
+    const blob = new Blob([lastRepeatResult], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'word-list.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+  // Photo metadata checker (for checking your own photos before sharing)
+  function dmsToDecimal(dms, ref){
+    const [d,m,s] = dms;
+    let dec = d + m/60 + s/3600;
+    if(ref === 'S' || ref === 'W') dec = -dec;
+    return dec;
+  }
+  document.getElementById('metaBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('metaInput');
+    const out = document.getElementById('metaResult');
+    if(!input.files.length){
+      out.textContent = 'សូមជ្រើសរើសរូបភាពសិន។';
+      out.classList.remove('filled');
+      return;
+    }
+    const file = input.files[0];
+    if(typeof EXIF === 'undefined'){
+      out.textContent = 'មិនអាចផ្ទុកម៉ូឌុលអានទិន្នន័យបានទេ សូមប្រាកដថាអ្នកកំពុងបើកទំព័រនេះជាមួយការភ្ជាប់អ៊ីនធឺណិត។';
+      return;
+    }
+    out.textContent = 'កំពុងវិភាគ…';
+    out.classList.remove('filled');
+    EXIF.getData(file, function(){
+      const lat = EXIF.getTag(this, 'GPSLatitude');
+      const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+      const lon = EXIF.getTag(this, 'GPSLongitude');
+      const lonRef = EXIF.getTag(this, 'GPSLongitudeRef');
+      const dateTaken = EXIF.getTag(this, 'DateTimeOriginal') || EXIF.getTag(this, 'DateTime');
+      const make = EXIF.getTag(this, 'Make');
+      const model = EXIF.getTag(this, 'Model');
+
+      let lines = [];
+      lines.push(`ឈ្មោះឯកសារ: ${file.name}`);
+      lines.push(`ទំហំឯកសារ: ${(file.size/1024).toFixed(1)} KB`);
+      if(dateTaken) lines.push(`ថ្ងៃថតរូប: ${dateTaken}`);
+      if(make || model) lines.push(`ឧបករណ៍ថត: ${[make, model].filter(Boolean).join(' ')}`);
+
+      if(lat && lon && latRef && lonRef){
+        const latDec = dmsToDecimal([lat[0].valueOf(), lat[1].valueOf(), lat[2].valueOf()], latRef);
+        const lonDec = dmsToDecimal([lon[0].valueOf(), lon[1].valueOf(), lon[2].valueOf()], lonRef);
+        lines.push('');
+        lines.push('⚠ រូបនេះមានទីតាំង GPS បង្កប់នៅក្នុងរូបភាព:');
+        lines.push(`  Latitude:  ${latDec.toFixed(6)}`);
+        lines.push(`  Longitude: ${lonDec.toFixed(6)}`);
+        lines.push(`  Google Maps: https://www.google.com/maps?q=${latDec.toFixed(6)},${lonDec.toFixed(6)}`);
+        lines.push('');
+        lines.push('គិតមុនចែករំលែករូបនេះ អ្នកអាចលុបទីតាំងចេញដោយប្រើកម្មវិធីកែរូបភាព ឬកម្មវិធីលុប metadata មុនពេលបញ្ចូន។');
+      } else {
+        lines.push('');
+        lines.push('✓ រូបនេះមិនមានទីតាំង GPS បង្កប់ទេ។');
+      }
+      out.textContent = lines.join('\n');
+      out.classList.add('filled');
+    });
+  });
+</script>
+
+</body>
+</html>
