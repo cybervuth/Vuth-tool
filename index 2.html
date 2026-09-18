@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vuthreaksa-tool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header>
+  <div class="mark mono">★ VUTH - TOOL ★</div>
+  <h1><span>ឧបករណ៍</span> សម្រាប់ប្រើប្រាស់</h1>
+  <p>Enjoy with tools</p>
+</header>
+
+<main>
+
+  <!-- TOOL 1: IP -->
+  <div class="tool" id="ip">
+    <div class="tool-head"><span class="tool-num mono">01</span><h2>ព័ត៌មាន IP របស់ខ្ញុំ</h2></div>
+    <p class="sub">ឧបករណ៍នេះនឹងប្រាប់អំពី IP របស់អ្នក </p>
+    <button class="action" id="ipBtn">បង្ហាញព័ត៌មាន IP របស់ខ្ញុំ</button>
+    <div class="result mono" id="ipResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">បង្ហាញតែអាសយដ្ឋានផ្ទាល់ខ្លួនរបស់អ្នកប៉ុណ្ណោះ</p>
+  </div>
+
+  <!-- TOOL 2: PHONE NUMBER INFO -->
+  <div class="tool" id="phone">
+    <div class="tool-head"><span class="tool-num mono">02</span><h2>ព័ត៌មានលេខទូរស័ព្ទ</h2></div>
+    <p class="sub">វាយលេខទូរស័ព្ទដែលអ្នកចង់ដឹងព័ត៌មានរបស់វា</p>
+    <div class="field">
+      <label>លេខទូរស័ព្ទ</label>
+      <input type="text" id="phoneInput" placeholder="Example 012345678">
+    </div>
+    <button class="action" id="phoneBtn">ពិនិត្យលេខ</button>
+    <div class="result mono" id="phoneResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ឧបករណ៍នេះអាចពិនិត្យមើលព័ត៌មានអំពីលេខទូរស័ព្ទកម្រិតតិចតួចប៉ុណ្ណោះ</p>
+  </div>
+
+  <!-- TOOL 3: TRANSLATE -->
+  <div class="tool" id="translate">
+    <div class="tool-head"><span class="tool-num mono">03</span><h2>បកប្រែភាសា</h2></div>
+    <p class="sub">បកប្រែភាសាបានច្រើនភាសា លើកលែងភាសាចោលសៀមមួយ Thiefland</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="translateInput" placeholder="វាយអត្ថបទដែលអ្នកចង់បកប្រែ"></textarea>
+    </div>
+    <div class="row" style="margin-bottom:14px;">
+      <div class="field" style="flex:1; min-width:140px;">
+        <label>ពីភាសា</label>
+        <select id="fromLang">
+          <option value="en">អង់គ្លេស</option>
+          <option value="km">ខ្មែរ</option>
+          <option value="es">អេស្ប៉ាញ</option>
+          <option value="fr">បារាំង</option>
+          <option value="de">អាល្លឺម៉ង់</option>
+          <option value="it">អ៊ីតាលី</option>
+          <option value="pt">ព័រទុយហ្កាល់</option>
+          <option value="ru">រុស្សី</option>
+          <option value="ja">ជប៉ុន</option>
+          <option value="ko">កូរ៉េ</option>
+          <option value="zh">ចិន</option>
+          <option value="vi">វៀតណាម</option>
+          <option value="id">ឥណ្ឌូនេស៊ី</option>
+          <option value="ms">ម៉ាឡេស៊ី</option>
+          <option value="hi">ហិណ្ឌូ</option>
+          <option value="ar">អារ៉ាប់</option>
+          <option value="tr">ទួរគី</option>
+          <option value="nl">ហូឡង់</option>
+          <option value="pl">ប៉ូឡូញ</option>
+          <option value="sv">ស៊ុយអែត</option>
+          <option value="fil">ហ្វីលីពីន</option>
+          <option value="lo">ឡាវ</option>
+          <option value="my">មីយ៉ាន់ម៉ា</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1; min-width:140px;">
+        <label>ទៅភាសា</label>
+        <select id="toLang">
+          <option value="km">ខ្មែរ</option>
+          <option value="en">អង់គ្លេស</option>
+          <option value="es">អេស្ប៉ាញ</option>
+          <option value="fr">បារាំង</option>
+          <option value="de">អាល្លឺម៉ង់</option>
+          <option value="it">អ៊ីតាលី</option>
+          <option value="pt">ព័រទុយហ្កាល់</option>
+          <option value="ru">រុស្សី</option>
+          <option value="ja">ជប៉ុន</option>
+          <option value="ko">កូរ៉េ</option>
+          <option value="zh">ចិន</option>
+          <option value="vi">វៀតណាម</option>
+          <option value="id">ឥណ្ឌូនេស៊ី</option>
+          <option value="ms">ម៉ាឡេស៊ី</option>
+          <option value="hi">ហិណ្ឌូ</option>
+          <option value="ar">អារ៉ាប់</option>
+          <option value="tr">ទួរគី</option>
+          <option value="nl">ហូឡង់</option>
+          <option value="pl">ប៉ូឡូញ</option>
+          <option value="sv">ស៊ុយអែត</option>
+          <option value="fil">ហ្វីលីពីន</option>
+          <option value="lo">ឡាវ</option>
+          <option value="my">មីយ៉ាន់ម៉ា</option>
+        </select>
+      </div>
+    </div>
+    <button class="action" id="translateBtn">បកប្រែ</button>
+    <div class="result mono" id="translateResult">លទ្ធផលបកប្រែនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ឧបករណ៍នេះមិនស្គាល់អក្សរអង់គ្លេសសុីងខ្មែរទេ</p>
+  </div>
+
+  <!-- TOOL 4: BASE64 -->
+  <div class="tool" id="b64text">
+    <div class="tool-head"><span class="tool-num mono">04</span><h2>Base64</h2></div>
+    <p class="sub">បម្លែងអត្ថបទធម្មតាទៅជា Base64 និងបកប្រែវិញ</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="b64Input" placeholder="វាយអត្ថបទនៅទីនេះ"></textarea>
+    </div>
+    <div class="row">
+      <button class="action" id="toBase64Btn">អត្ថបទ → Base64</button>
+      <button class="action" id="fromBase64Btn">Base64 → អត្ថបទ</button>
+    </div>
+    <div class="result mono" id="b64Result">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="b64CopyBtn">ចម្លងលទ្ធផល</button>
+    </div>
+  </div>
+
+  <!-- TOOL 5: BINARY -->
+  <div class="tool" id="binarytext">
+    <div class="tool-head"><span class="tool-num mono">05</span><h2>Binary</h2></div>
+    <p class="sub">បម្លែងអត្ថបទធម្មតាទៅជា Binary និងបកប្រែមកវិញ</p>
+    <div class="field">
+      <label>អត្ថបទ</label>
+      <textarea id="binInput" placeholder="វាយអត្ថបទនៅទីនេះ"></textarea>
+    </div>
+    <div class="row">
+      <button class="action" id="toBinaryBtn">អត្ថបទ → Binary</button>
+      <button class="action" id="fromBinaryBtn">Binary → អត្ថបទ</button>
+    </div>
+    <div class="result mono" id="binResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="binCopyBtn">ចម្លងលទ្ធផល</button>
+    </div>
+  </div>
+
+  <!-- TOOL 6: WORD REPEATER -->
+  <div class="tool" id="wordgen">
+    <div class="tool-head"><span class="tool-num mono">06</span><h2>ឧបករណ៍ចម្លងពាក្យច្រើន</h2></div>
+    <p class="sub">ឧបករណ៍នេះអាចបង្កើតពាក្យឬឃ្លាដែលអ្នកចង់សរសេរហើយវានឹងបង្កើតពាក្យឬឃ្លានោះដែលអ្នកចង់បានរាប់ជួរនិងមានលេខរាប់ជួរឬអត់តាមតែអ្នក</p>
+    <div class="field">
+      <label>ពាក្យ / ឃ្លា</label>
+      <input type="text" id="repeatWord" placeholder="Exaple បងស្រលាញ់អូន">
+    </div>
+    <div class="row" style="margin-bottom:14px; align-items:flex-end;">
+      <div class="field" style="max-width:200px; margin-bottom:0;">
+        <label>ចំនួនដងដែលចង់បាន</label>
+        <input type="text" id="repeatCount" value="10">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="repeatNumbered" checked style="width:auto;">
+          ដាក់លេខរាប់ជួរ
+        </label>
+      </div>
+    </div>
+    <button class="action" id="repeatBtn">បង្កើតបញ្ជី</button>
+    <div class="result mono" id="repeatResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="ghost" id="repeatCopyBtn">ចម្លងលទ្ធផល</button>
+      <button class="ghost" id="repeatDownloadBtn">ទាញយកជា file.txt</button>
+    </div>
+  </div>
+
+  <!-- TOOL 7: PHOTO METADATA CHECKER -->
+  <div class="tool" id="photometa">
+    <div class="tool-head"><span class="tool-num mono">07</span><h2>ពិនិត្យទិន្នន័យលាក់នៅក្នុងរូបភាព</h2></div>
+    <p class="sub">ឧបករណ៍នេះសម្រាប់ពិនិត្យរូបភាព <b>របស់អ្នកផ្ទាល់</b> មុនពេលបញ្ចូនអោយអ្នកដទៃ ឬបង្ហោះលើ social media ដើម្បីមើលថាតើវាមានទីតាំង GPS ឬព័ត៌មានផ្សេងលាក់នៅក្នុងវាដែរឬអត់</p>
+    <div class="field">
+      <label>ជ្រើសរើសរូបភាព (JPEG)</label>
+      <input type="file" id="metaInput" accept="image/jpeg,image/jpg">
+    </div>
+    <button class="action" id="metaBtn">ពិនិត្យរូបភាព</button>
+    <div class="result mono" id="metaResult">លទ្ធផលនឹងបង្ហាញនៅទីនេះ</div>
+    <p class="note">ប្រើសម្រាប់ការពារភាពឯកជនរបស់អ្នកប៉ុណ្ណោះ</p>
+  </div>
+
+</main>
+
+<footer>Made by VuthReaksa Developer</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
